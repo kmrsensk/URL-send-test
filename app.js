@@ -56,10 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch(url, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: payloadString
+                body: payloadString // Content-Typeを指定しないことでシンプルリクエスト化する
             });
 
             const responseText = await response.text();
