@@ -5,7 +5,7 @@
     --text-color: #333;
     --error-bg: #ffe6e6;
     --error-color: #cc0000;
-    --drawer-width: 350px;
+    --drawer-width: 380px;
 }
 
 body {
@@ -207,6 +207,28 @@ button.send-btn:disabled {
 
 .drawer-header h2 { margin: 0; font-size: 18px; }
 
+.drawer-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.clear-all-btn {
+    background: #e74c3c;
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    font-size: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+.clear-all-btn:hover {
+    background: #c0392b;
+}
+
 .close-btn { 
     background: none; 
     border: none; 
@@ -232,7 +254,10 @@ button.send-btn:disabled {
     border-radius: 6px;
     padding: 12px;
     margin-bottom: 12px;
-    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
     transition: border-color 0.2s, background-color 0.2s;
 }
 
@@ -241,9 +266,31 @@ button.send-btn:disabled {
     background-color: #f1f8ff;
 }
 
+.history-content {
+    flex-grow: 1;
+    min-width: 0; /* 文字あふれ省略(ellipsis)を効かせるため */
+    cursor: pointer;
+}
+
 .history-time { font-size: 12px; color: #888; margin-bottom: 5px; font-weight: bold; }
 .history-url { font-size: 13px; font-weight: bold; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 5px; }
 .history-payload-preview { font-size: 12px; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Courier New', monospace; }
+
+.delete-single-btn {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+    transition: background 0.2s;
+    opacity: 0.6;
+}
+
+.delete-single-btn:hover {
+    background: #fecdd3;
+    opacity: 1;
+}
 
 .empty-history { text-align: center; color: #999; padding: 20px; font-size: 14px; }
 
