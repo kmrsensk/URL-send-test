@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webhook Tester</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Webhook Tester</h1>
+        <p>指定したURLにJSONペイロードをPOST送信します。</p>
+
+        <div class="form-group">
+            <label for="webhook-url">Target URL (Webhook URL):</label>
+            <input type="url" id="webhook-url" placeholder="https://hooks.slack.com/services/..." required>
+        </div>
+
+        <div class="form-group">
+            <label for="payload-data">Payload (JSON):</label>
+            <textarea id="payload-data" rows="10" placeholder='{&#10;  "text": "Hello, World!"&#10;}' required></textarea>
+        </div>
+
+        <button id="send-btn">送信する</button>
+
+        <div class="result-group">
+            <label>Response / Result:</label>
+            <pre id="result-area">結果がここに表示されます...</pre>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
