@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ドロワー関連
     const openHistoryBtn = document.getElementById('open-history-btn');
     const closeHistoryBtn = document.getElementById('close-history-btn');
+    const clearAllBtn = document.getElementById('clear-all-btn');
     const drawerOverlay = document.getElementById('drawer-overlay');
     const historyDrawer = document.getElementById('history-drawer');
     const historyListUl = document.getElementById('history-list');
@@ -45,6 +46,18 @@ document.addEventListener('DOMContentLoaded', () => {
     closeHistoryBtn.addEventListener('click', () => toggleDrawer(false));
     drawerOverlay.addEventListener('click', () => toggleDrawer(false));
 
+    // 全削除ボタンのイベント
+    clearAllBtn.addEventListener('click', () => {
+        if (historyData.length === 0) return;
+        
+        if (confirm('すべての送信履歴を削除してもよろしいですか？\n(入力フォームの内容は残ります)')) {
+            historyData = [];
+            localStorage.removeItem(STORAGE_KEY_HISTORY);
+            renderHistoryList();
+            resultArea.textContent = 'すべての送信履歴を削除しました。';
+        }
+    });
+
     // 履歴一覧を描画する関数
     const renderHistoryList = () => {
         historyListUl.innerHTML = '';
@@ -53,26 +66,30 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        historyData.forEach((item) => {
+        historyData.forEach((item, index) => {
             const li = document.createElement('li');
             li.className = 'history-item';
             
             // JSONの改行を消してプレビュー用にする
-            const previewText = item.payload.replace(/\s+/g, ' ').substring(0, 60) + '...';
+            const previewText = item.payload.replace(/\s+/g, ' ').substring(0, 50) + '...';
             const isSuccess = item.status && item.status.toString().startsWith('2');
             const statusClass = isSuccess ? 'status-success' : 'status-error';
 
+            // 1つの履歴要素の構造を作成（テキストエリアと削除ボタンに分ける）
             li.innerHTML = `
-                <div class="history-time">
-                    ${item.time} 
-                    <span class="status-badge ${statusClass}">${item.status || 'Error'}</span>
+                <div class="history-content">
+                    <div class="history-time">
+                        ${item.time} 
+                        <span class="status-badge ${statusClass}">${item.status || 'Error'}</span>
+                    </div>
+                    <div class="history-url">${item.url}</div>
+                    <div class="history-payload-preview">${previewText}</div>
                 </div>
-                <div class="history-url">${item.url}</div>
-                <div class="history-payload-preview">${previewText}</div>
+                <button class="delete-single-btn" title="この履歴を削除">❌</button>
             `;
 
-            // 履歴アイテムをクリックしたらフォームに復元
-            li.addEventListener('click', () => {
+            // テキスト部分をクリックしたらフォームに復元
+            li.querySelector('.history-content').addEventListener('click', () => {
                 urlInput.value = item.url;
                 payloadInput.value = item.payload;
                 
@@ -82,6 +99,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 hideMessage();
                 resultArea.textContent = '履歴からデータを復元しました。送信ボタンを押すと再送信できます。';
                 toggleDrawer(false);
+            });
+
+            // 個別削除ボタンのイベント
+            li.querySelector('.delete-single-btn').addEventListener('click', (e) => {
+                e.stopPropagation(); // 親要素（復元処理）へのクリックイベント伝播を防ぐ
+                
+                if (confirm('この履歴を削除しますか？')) {
+                    historyData.splice(index, 1); // 配列から該当要素を削除
+                    localStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(historyData));
+                    renderHistoryList(); // 再描画
+                }
             });
 
             historyListUl.appendChild(li);
@@ -164,7 +192,6 @@ document.addEventListener('DOMContentLoaded', () => {
         resultArea.textContent = 'リクエストを送信しています...';
 
         try {
-            // CORS回避のため headers を指定せず、シンプルリクエストとして送信する
             const response = await fetch(url, {
                 method: 'POST',
                 body: payloadString 
@@ -179,15 +206,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             resultArea.textContent = `[Status: ${response.status} ${response.statusText}]\n\n${responseText || '(No response body)'}`;
-            
-            // 履歴に保存
             saveToHistory(url, payloadString, response.status);
             
         } catch (error) {
             showMessage('通信エラーが発生しました', 'error');
             resultArea.textContent = `【ネットワークエラーが発生しました】\n${error.message}\n\n※CORSによって通信がブロックされたか、URLが間違っている可能性があります。`;
-            
-            // エラー時も履歴に保存
             saveToHistory(url, payloadString, 'Error');
             console.error('Fetch error:', error);
         } finally {
