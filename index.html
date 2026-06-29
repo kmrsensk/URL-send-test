@@ -8,8 +8,17 @@
 </head>
 <body>
     <div class="container">
-        <h1>Webhook Tester</h1>
-        <p>指定したURLにJSONペイロードをPOST送信します。</p>
+        <div class="header-area">
+            <h1>Webhook Tester</h1>
+            <button id="open-history-btn" class="history-toggle-btn">📜 履歴を開く</button>
+        </div>
+        
+        <p class="description">指定したURLにJSONペイロードをPOST送信します。<br>入力内容はブラウザに保存され、右上のボタンから過去の履歴を復元できます。</p>
+
+        <div class="notice">
+            <strong>【簡易CORS対策適用中】</strong><br>
+            ブラウザからの直接送信によるエラーを防ぐため、<code>Content-Type: application/json</code> ヘッダーを除外して送信します（Slack Webhook等で有効なケースがあります）。
+        </div>
 
         <div class="form-group">
             <label for="webhook-url">Target URL (Webhook URL):</label>
@@ -18,15 +27,28 @@
 
         <div class="form-group">
             <label for="payload-data">Payload (JSON):</label>
-            <textarea id="payload-data" rows="10" placeholder='{&#10;  "text": "Hello, World!"&#10;}' required></textarea>
+            <textarea id="payload-data" rows="8" placeholder='{&#10;  "text": "Hello, World!"&#10;}' required></textarea>
         </div>
 
-        <button id="send-btn">送信する</button>
+        <div class="button-group">
+            <button id="send-btn" class="send-btn">送信する</button>
+            <div id="message-box"></div>
+        </div>
 
         <div class="result-group">
             <label>Response / Result:</label>
             <pre id="result-area">結果がここに表示されます...</pre>
         </div>
+    </div>
+
+    <div id="drawer-overlay" class="drawer-overlay"></div>
+    <div id="history-drawer" class="drawer">
+        <div class="drawer-header">
+            <h2>送信履歴</h2>
+            <button id="close-history-btn" class="close-btn">&times;</button>
+        </div>
+        <ul id="history-list" class="history-list">
+            </ul>
     </div>
 
     <script src="app.js"></script>
